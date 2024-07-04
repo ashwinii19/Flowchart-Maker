@@ -1,8 +1,10 @@
 <script>
     import { onMount } from 'svelte';
+	import html2canvas from 'html2canvas';
 
     let currentPage = 'home';
 
+	//navigaet to page
     function navigate(page) {
         currentPage = page;
     }
@@ -10,6 +12,29 @@
     onMount(() => {
         console.log('Component mounted');
     });
+
+	// download the flowchart
+	function downloadAsImage() {
+    const element = document.getElementById('content-to-download');
+
+    const paragraphs = element.querySelectorAll('p');
+    paragraphs.forEach(p => {
+        p.style.display = 'none';
+    });
+
+    html2canvas(element).then(canvas => {
+        paragraphs.forEach(p => {
+            p.style.display = '';
+        });
+
+        const url = canvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'download.png';
+        a.click();
+    });
+}
+
 </script>
 
 
@@ -17,6 +42,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     {#if currentPage === 'home'}
+		<!-- home page -->
         <div class="mainbody">
             <div class="top">
                 <div class="search"></div>
@@ -27,7 +53,7 @@
                     <p><marquee>Streamline Your Workflow with Clarity</marquee></p>
                     <p>The ultimate tool for transforming complex ideas into <br>clear visual representation. Streamline your workflow <br> with user-friendly, drag and drop flowchart creations<br>& effortlessly design professional diagrams in minute</p>
                     <p>Let's start to make your own flowchart</p>
-                    <button on:click={() => navigate('about')}>Let's Make </button>
+                    <button on:click={() => navigate('dashboard')}>Let's Make </button>
                 </div>
         
                 <div class="right" id="flowchart"></div>
@@ -39,16 +65,42 @@
                 </div>
             </div>
         </div>
-		{:else if currentPage === 'about'}
-        <div class="aboutbody">
-            <h2>About Section</h2>
-            <p>This is the about section content.</p>
-            <button on:click={() => navigate('home')}>Back to Home</button>
-        </div>
+		{:else if currentPage === 'dashboard'}
+
+		<!-- dashboard page-->
+        <div class="dashboardbody">
+			<div class="main-content">
+				<div class="sidebar">
+					<div class="dashboard" id="dashboard-logo">
+					</div>
+
+					<button on:click={() => navigate('home')}>Home</button>
+					<div class="search-bar">
+						<input type="text" placeholder="search shape...">
+					</div>
+
+					<div class="elements-section">
+						<h3>Elements Section</h3>
+						<p>Content for elements section.</p>
+					</div>
+
+					<button class="download-button" on:click={downloadAsImage}>Download</button>
+				</div>
+
+				<div id="content-to-download" class="content">
+					<p><marquee>Visualize your ideas with flow</marquee></p>
+				</div>
+				
+			</div>
+		</div>
+
     {/if}
+
 </div>
 
 <style>
+
+	/** css for home page */
 	.mainbody {
 		width: 100%;
 		height: 600px;
@@ -89,7 +141,7 @@
 		left: -10px; 
 	}
 
-	/***left*****/
+	/**left**/
 	.left p:nth-child(1) {
 		color: orange;
 		font-size: 30px;
@@ -119,7 +171,7 @@
 		padding-bottom: 20px;
 	}
 
-	/****SocialMedia******/
+	/*SocialMedia***/
 	.SocialMedia {
 		position: absolute;
 		right: 11%;
@@ -138,7 +190,7 @@
 		color: orange;
 	}
 
-	/*****letsmake****/
+	/**lets make*/
 
 	.left button {
 		width: 150px;
@@ -172,5 +224,186 @@
 		color: white;
 	}
 
-	
+	/** css for dashboard **/
+
+	.dashboardbody {
+        display: flex;
+        flex-direction: column;
+        height: 1000px;
+        font-family: Arial, sans-serif;
+    }
+
+    .dashboardbody .main-content {
+        display: flex;
+        flex: 1;
+        background-color: #F0F0F0;
+        overflow: hidden;
+    }
+
+    .dashboardbody .sidebar {
+		position: relative;
+        width: 300px;
+        background-color: #D3D3D3; 
+        padding: 20px;
+        box-sizing: border-box;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        overflow-y: auto;
+    }
+
+    .dashboardbody .search-bar {
+        margin-bottom: 20px;
+    }
+
+    .dashboardbody .search-bar input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #C0C0C0;
+    }
+
+    .dashboardbody .color-section, .dashboardbody .elements-section {
+        margin-bottom: 20px;
+		position: relative;
+        padding: 20px;
+        background-color: white;
+        border: 1px solid #C0C0C0;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .dashboardbody .elements-section {
+        background-color: #ADD8E6; 
+		height: 550px;
+    }
+
+    .dashboardbody .content {
+        flex: 1;
+        padding: 20px;
+        box-sizing: border-box;
+        overflow-y: auto;
+    }
+
+    .dashboardbody .content h2 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .dashboardbody .content p {
+        line-height: 1.6;
+    }
+
+    .dashboardbody  button {
+    width: 100%;
+    height: 50px;
+    font-size: 18px;
+    border-radius: 15px;
+    border: black; 
+    background-color: #FF8C00; 
+    color: white;
+    margin: 20 0px;
+	margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: all 0.2s linear;
+}
+
+.dashboardbody  button::before {
+    content: "\f060"; /* FontAwesome left arrow icon */
+    font-family: FontAwesome;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    font-size: 30px;
+    transform: scale(0, 1);
+    transition: all 0.2s linear;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.dashboardbody  button:hover {
+    text-indent: -9999px;
+}
+
+.dashboardbody  button:hover::before {
+    transform: scale(1, 1);
+    text-indent: 0;
+}
+
+/* Download button */
+.dashboardbody  .download-button {
+	position: absolute;
+    width: 100%;
+    height: 50px;
+    font-size: 18px;
+    border-radius: 15px;
+    border: black; 
+    background-color: #FF8C00; 
+    color: white;
+    margin: 20 0px;
+	margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: all 0.2s linear;
+}
+
+.dashboardbody  .download-button::before {
+    content: "\f019"; /* FontAwesome download icon */
+    font-family: FontAwesome;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    font-size: 30px;
+    transform: scale(0, 1);
+    transition: all 0.2s linear;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.dashboardbody  .download-button:hover {
+    text-indent: -9999px;
+}
+
+.dashboardbody  .download-button:hover::before {
+    transform: scale(1, 1);
+    text-indent: 0;
+}
+
+.dashboard {
+		width: 150px;
+		height: 150px;
+		background-image: url('task.gif');
+		background-size: cover;
+		border-radius: 50%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-top: 4.1%;
+		margin-left: 20%;
+		margin-bottom: 10%;
+		position: relative; 
+	}
+
+	.content p{
+		color: orange;
+		font-size: 30px;
+		letter-spacing: 1px;
+		font-style: italic;
+		white-space: nowrap; 
+		overflow: hidden;
+		box-sizing: border-box;
+		animation: marquee 15s linear infinite;
+	}
+
 </style>
