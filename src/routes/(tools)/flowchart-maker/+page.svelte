@@ -11,6 +11,10 @@
   let triangles = [];
   let hexagons = [];
   let ors = [];
+  let rightarrows = [];
+  let leftarrows = [];
+  let uparrows = [];
+  let downarrows = [];
 
   // navigate to page
   function navigate(page) {
@@ -85,6 +89,27 @@
   }
 
 
+  // add a arrow
+  function addRightarrow() {
+    rightarrows = [...rightarrows, { el: null, isMoving: false, startX: 0, startY: 0 }];
+  }
+
+  // add a arrow
+  function addLeftarrow() {
+    leftarrows = [...leftarrows, { el: null, isMoving: false, startX: 0, startY: 0 }];
+  }
+
+  // add a arrow
+  function addUparrow() {
+    uparrows = [...uparrows, { el: null, isMoving: false, startX: 0, startY: 0 }];
+  }
+
+  // add a arrow
+  function addDownarrow() {
+    downarrows = [...downarrows, { el: null, isMoving: false, startX: 0, startY: 0 }];
+  }
+
+
 // handle mouse down events for moving and resizing shapes
 function handleMouseDown(index, action, type) {
     return function (event) {
@@ -107,6 +132,14 @@ function handleMouseDown(index, action, type) {
         items = hexagons;
       } else if (type === 'or') {
         items = ors;
+      } else if (type === 'rightarrow') {
+        items = rightarrows;
+      } else if (type === 'leftarrow') {
+        items = leftarrows;
+      } else if (type === 'downarrow') {
+        items = downarrows;
+      } else if (type === 'uparrow') {
+        items = uparrows;
       }
 
       if (action === 'move') {
@@ -158,18 +191,8 @@ function handleMouseDown(index, action, type) {
   let searchQuery = ''; 
   let selectedColor1 = ''; 
   let selectedColor2 = '';
-  function handleSearch(event) {
-        searchQuery = event.target.value.trim().toLowerCase(); 
-        hoveredButtonId = '';
-    }
 
-// Function to change background color of divs
-function changeBackgroundColor() {
-    let divs = document.querySelectorAll('.content div');
-    divs.forEach(div => {
-        div.style.backgroundColor = selectedColor1;
-    });
-}
+// Function to change background color of div
 
 // Function to change background color of divs
 function changeTextColor() {
@@ -177,25 +200,6 @@ function changeTextColor() {
     divs.forEach(div => {
         div.style.color = selectedColor2;
     });
-}
-
-
-// Function to add hover effect on buttons based on search query
-function addHoverEffect(id) {
-    const buttons = document.querySelectorAll('.elements-section button');
-    buttons.forEach(button => {
-        if (button.id.toLowerCase() === id.toLowerCase()) {
-            button.classList.add('hovered');
-        } else {
-            button.classList.remove('hovered');
-        }
-    });
-}
-
-// Event listener to add hover effect on button click
-function handleButtonClick(event) {
-    const buttonId = event.target.id;
-    addHoverEffect(buttonId);
 }
 
 </script>
@@ -237,25 +241,9 @@ function handleButtonClick(event) {
         <div class="dashboard" id="dashboard-logo"></div>
 
         <button class="home-button" on:click={() => navigate('home')}>Home</button>
-        <div class="search-bar">
-          <input type="text" placeholder="search shape..." on:input={handleSearch}>
-        </div>
 
         <div class="elements-section">
-          Background Color
-          <select bind:value={selectedColor1} on:change={changeBackgroundColor}>
-            <option value="">Change BG color</option>
-            <option value="#FF6347">Tomato</option>
-            <option value="#7FFFD4">Aquamarine</option>
-            <option value="#9370DB">MediumPurple</option>
-            <option value="#FFD700">Gold</option>
-            <option value="#66CDAA">MediumAquamarine</option>
-            <option value="#40E0D0">Turquoise</option>
-            <option value="#FFA07A">LightSalmon</option>
-            <option value="#AFEEEE">PaleTurquoise</option>
-            <option value="#DDA0DD">Plum</option>
-            <option value="#FFB6C1">LightPink</option>
-        </select>
+         
         Text Color
         <select bind:value={selectedColor2} on:change={changeTextColor}>
           <option value="">Change Text color</option>
@@ -277,7 +265,11 @@ function handleButtonClick(event) {
           <button class="parallelogram-button" id="parallelogram" on:click={addParallelogram}>Data</button>
           <button class="triangle-button" id="triangle" on:click={addTriangle}>Merge</button>
           <button class="hexagon-button" id="hexagon" on:click={addHexagon}>Preparation</button>
-          <button class="or-button" on:click={addOr}>Or</button>
+          <button class="or-button" id="or" on:click={addOr}>Or</button>
+          <button class="rightarrow-button" id="rightarrow" on:click={addRightarrow}>Right Arrow</button>
+          <button class="leftarrow-button" id="leftarrow" on:click={addLeftarrow}>Left Arrow</button>
+          <button class="downarrow-button" id="downarrow" on:click={addDownarrow}>Down Arrow</button>
+          <button class="uparrow-button" id="uparrow" on:click={addUparrow}>Up Arrow</button>
         </div>
 
         <button class="download-button" on:click={downloadAsImage}>Download</button>
@@ -359,6 +351,34 @@ function handleButtonClick(event) {
             on:mousedown={handleMouseDown(index, 'move', 'or')}>
             <div class="horizontal-diameter"></div>
             <div class="vertical-diameter"></div>
+        </div>
+      {/each}
+
+      {#each rightarrows as rightarrow, index (rightarrow)}
+        <div class="rightarrow"
+            bind:this={rightarrow.el}
+            on:mousedown={handleMouseDown(index, 'move', 'rightarrow')}>
+        </div>
+      {/each}
+
+      {#each leftarrows as leftarrow, index (leftarrow)}
+        <div class="leftarrow"
+            bind:this={leftarrow.el}
+            on:mousedown={handleMouseDown(index, 'move', 'leftarrow')}>
+        </div>
+      {/each}
+
+      {#each downarrows as downarrow, index (downarrow)}
+        <div class="downarrow"
+            bind:this={downarrow.el}
+            on:mousedown={handleMouseDown(index, 'move', 'downarrow')}>
+        </div>
+      {/each}
+
+      {#each uparrows as uparrow, index (uparrow)}
+        <div class="uparrow"
+            bind:this={uparrow.el}
+            on:mousedown={handleMouseDown(index, 'move', 'uparrow')}>
         </div>
       {/each}
 
@@ -794,11 +814,13 @@ function handleButtonClick(event) {
   }
 
   .oval-textbox {
-    width: calc(100% - 20px); 
-    height: calc(100% - 20px);
+    width: calc(100% - 40px); 
+    height: calc(100% - 70px);
     border: none;
     box-sizing: border-box;
     padding: 5px;
+    margin-left: 15px;
+    margin-top: 30px;
     overflow: hidden;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -824,8 +846,8 @@ function handleButtonClick(event) {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) rotate(-45deg); 
-  width: calc(100% - 20px); 
-  height: calc(100% - 20px);
+  width: calc(100% - 28px); 
+  height: calc(100% - 28px);
   border: none;
   box-sizing: border-box;
   padding: 5px;
@@ -885,7 +907,7 @@ function handleButtonClick(event) {
   height: 0;
   border-left: 75px solid transparent; 
   border-right: 75px solid transparent; 
-  background-color: lightblue; 
+  border-top: 150px solid lightblue;
   position: absolute;
   top: 0;
   left: 50%;
@@ -995,6 +1017,86 @@ function handleButtonClick(event) {
   transform: translateX(-50%);
   cursor: ew-resize; 
   background-color: black;
+}
+
+.rightarrow {
+  position: relative;
+  width: 100px; 
+  height: 3px; 
+  background-color: lightblue; 
+}
+
+.rightarrow::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -10px; 
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent; 
+  border-left: 10px solid black; 
+}
+
+.leftarrow {
+  position: relative;
+  width: 100px;
+  height: 3px;
+  background-color: lightblue;
+}
+
+.leftarrow::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -10px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 10px solid black;
+}
+
+.uparrow {
+  position: relative;
+  width: 3px;
+  height: 100px;
+  background-color: lightblue;
+}
+
+.uparrow::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -10px;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid black;
+}
+
+.downarrow {
+  position: relative;
+  width: 3px;
+  height: 100px;
+  background-color: lightblue;
+}
+
+.downarrow::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid black;
 }
 
 
