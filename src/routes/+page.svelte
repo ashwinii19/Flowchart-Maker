@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from "svelte";
+	import html2canvas from "html2canvas";
 
 	let rectangles = [];
 	let circles = [];
@@ -14,37 +14,38 @@
 	let selectedShapeColor1 = "#000000";
 	let selectedShapeColor2 = "#ffffff";
 	let selectedTextColor = "#000000";
+	let selectedShape = null;
 
 	function addRectangle() {
-		rectangles = [...rectangles, { id: rectangles.length, el: null, text: "Rectangle" }];
+		rectangles = [...rectangles, { id: rectangles.length, el: null, text: 'Rectangle', borderColor: selectedShapeColor1, backgroundColor: selectedShapeColor2, textColor: selectedTextColor }];
 	}
 
 	function addCircle() {
-		circles = [...circles, { id: circles.length, el: null, text: "Circle" }];
+		circles = [...circles, { id: circles.length, el: null, text: 'Circle', borderColor: selectedShapeColor1, backgroundColor: selectedShapeColor2, textColor: selectedTextColor }];
 	}
 
 	function addOval() {
-		ovals = [...ovals, { id: ovals.length, el: null, text: "Oval" }];
+		ovals = [...ovals, { id: ovals.length, el: null, text: 'Oval', borderColor: selectedShapeColor1, backgroundColor: selectedShapeColor2, textColor: selectedTextColor }];
 	}
 
 	function addRhombus() {
-		rhombuses = [...rhombuses, { id: rhombuses.length, el: null, text: "Rhombus" }];
+		rhombuses = [...rhombuses, { id: rhombuses.length, el: null, text: 'Rhombus', borderColor: selectedShapeColor1, backgroundColor: selectedShapeColor2, textColor: selectedTextColor }];
 	}
 
 	function addParallelogram() {
-		parallelograms = [...parallelograms, { id: parallelograms.length, el: null, text: "Parallelogram" }];
+		parallelograms = [...parallelograms, { id: parallelograms.length, el: null, text: 'Parallelogram', borderColor: selectedShapeColor1, backgroundColor: selectedShapeColor2, textColor: selectedTextColor }];
 	}
 
 	function addTriangle() {
-		triangles = [...triangles, { id: triangles.length, el: null, text: "Triangle" }];
+		triangles = [...triangles, { id: triangles.length, el: null, text: 'Triangle', borderColor: selectedShapeColor1, backgroundColor: selectedShapeColor2, textColor: selectedTextColor }];
 	}
 
 	function addHexagon() {
-		hexagons = [...hexagons, { id: hexagons.length, el: null, text: "Hexagon" }];
+		hexagons = [...hexagons, { id: hexagons.length, el: null, text: 'Hexagon', borderColor: selectedShapeColor1, backgroundColor: selectedShapeColor2, textColor: selectedTextColor }];
 	}
 
 	function addOr() {
-		ors = [...ors, { id: ors.length, el: null, text: "Or" }];
+		ors = [...ors, { id: ors.length, el: null, text: 'Or', borderColor: selectedShapeColor1, backgroundColor: selectedShapeColor2, textColor: selectedTextColor }];
 	}
 
 	function handleMouseDown(index, action, type) {
@@ -139,74 +140,26 @@
 		}
 	}
 
-	function changeShapeColor(index, type) {
-		let shape;
-		switch (type) {
-			case 'rectangle':
-				shape = rectangles[index];
-				break;
-			case 'circle':
-				shape = circles[index];
-				break;
-			case 'oval':
-				shape = ovals[index];
-				break;
-			case 'rhombus':
-				shape = rhombuses[index];
-				break;
-			case 'parallelogram':
-				shape = parallelograms[index];
-				break;
-			case 'triangle':
-				shape = triangles[index];
-				break;
-			case 'hexagon':
-				shape = hexagons[index];
-				break;
-			case 'or':
-				shape = ors[index];
-				break;
-		}
-		if (shape.el) {
-			shape.el.style.borderColor = selectedShapeColor1;
-			shape.el.style.backgroundColor = selectedShapeColor2;
+	function selectShape(shape) {
+		selectedShape = shape;
+	}
+
+	function applySelectedColor() {
+		if (selectedShape) {
+			selectedShape.borderColor = selectedShapeColor1;
+			selectedShape.backgroundColor = selectedShapeColor2;
+			selectedShape.textColor = selectedTextColor;
 		}
 	}
 
-	function changeTextColor(index, type) {
-		let shape;
-		switch (type) {
-			case 'rectangle':
-				shape = rectangles[index];
-				break;
-			case 'circle':
-				shape = circles[index];
-				break;
-			case 'oval':
-				shape = ovals[index];
-				break;
-			case 'rhombus':
-				shape = rhombuses[index];
-				break;
-			case 'parallelogram':
-				shape = parallelograms[index];
-				break;
-			case 'triangle':
-				shape = triangles[index];
-				break;
-			case 'hexagon':
-				shape = hexagons[index];
-				break;
-			case 'or':
-				shape = ors[index];
-				break;
-		}
-		if (shape.el) {
-			const text = shape.el.querySelector('p');
-			if (text) {
-				text.style.color = selectedTextColor;
-			}
-		}
+	function downloadAsImage() {
+		const content = document.getElementById('content-to-download');
+		html2canvas(content).then(canvas => {
+			const link = document.createElement('a');
+			link.href = canvas.toDataURL();
+			link.download = 'flowchart.png';
+			link.click();
+		});
 	}
 </script>
 
@@ -232,99 +185,84 @@
 				
 					<label for="shapeBackgroundColor">Shape Background Color:</label>
 					<input type="color" id="shapeBackgroundColor" bind:value={selectedShapeColor2}>
-				
 					<label for="textColor">Text Color:</label>
 					<input type="color" id="textColor" bind:value={selectedTextColor}>
+					<button on:click={applySelectedColor}>Apply Selected Color</button>
 				</div>
 				
+				<button on:click={downloadAsImage}>Download as Image</button>
 			</div>
 
 			<div class="content" id="content-to-download">
 				{#each rectangles as rect, index}
-					<div bind:this={rect.el} class="rectangle" on:mousedown={handleMouseDown(index, 'move', 'rectangle')}>
-						<input type="text" bind:value={rect.text} />
-						<p>{rect.text}</p>
+					<div bind:this={rect.el} class="rectangle" on:mousedown={handleMouseDown(index, 'move', 'rectangle')} style="border-color: {rect.borderColor}; background-color: {rect.backgroundColor};">
+						<p contenteditable="true" style="color: {rect.textColor};">{rect.text}</p>
 						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'rectangle')}></span>
 						<button class="delete-btn" on:click={() => deleteShape(index, 'rectangle')}>X</button>
-						<button class="color-btn" on:click={() => changeShapeColor(index, 'rectangle')}>Color</button>
-						<button class="text-btn" on:click={() => changeTextColor(index, 'rectangle')}>Text</button>
+						<button class="select-btn" on:click={() => selectShape(rect)}>Select</button>
 					</div>
 				{/each}
 
 				{#each circles as circ, index}
-					<div bind:this={circ.el} class="circle" on:mousedown={handleMouseDown(index, 'move', 'circle')}>
-						<input type="text" bind:value={circ.text} />
-						<p>{circ.text}</p>
+					<div bind:this={circ.el} class="circle" on:mousedown={handleMouseDown(index, 'move', 'circle')} style="border-color: {circ.borderColor}; background-color: {circ.backgroundColor};">
+						<p contenteditable="true" style="color: {circ.textColor};">{circ.text}</p>
 						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'circle')}></span>
 						<button class="delete-btn" on:click={() => deleteShape(index, 'circle')}>X</button>
-						<button class="color-btn" on:click={() => changeShapeColor(index, 'circle')}>Color</button>
-						<button class="text-btn" on:click={() => changeTextColor(index, 'circle')}>Text</button>
+						<button class="select-btn" on:click={() => selectShape(circ)}>Select</button>
 					</div>
 				{/each}
 
 				{#each ovals as ov, index}
-					<div bind:this={ov.el} class="oval" on:mousedown={handleMouseDown(index, 'move', 'oval')}>
-						<input type="text" bind:value={ov.text} />
-						<p>{ov.text}</p>
+					<div bind:this={ov.el} class="oval" on:mousedown={handleMouseDown(index, 'move', 'oval')} style="border-color: {ov.borderColor}; background-color: {ov.backgroundColor};">
+						<p contenteditable="true" style="color: {ov.textColor};">{ov.text}</p>
 						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'oval')}></span>
 						<button class="delete-btn" on:click={() => deleteShape(index, 'oval')}>X</button>
-						<button class="color-btn" on:click={() => changeShapeColor(index, 'oval')}>Color</button>
-						<button class="text-btn" on:click={() => changeTextColor(index, 'oval')}>Text</button>
+						<button class="select-btn" on:click={() => selectShape(ov)}>Select</button>
 					</div>
 				{/each}
 
 				{#each rhombuses as rho, index}
-					<div bind:this={rho.el} class="rhombus" on:mousedown={handleMouseDown(index, 'move', 'rhombus')}>
-						<input type="text" bind:value={rho.text} />
-						<p>{rho.text}</p>
+					<div bind:this={rho.el} class="rhombus" on:mousedown={handleMouseDown(index, 'move', 'rhombus')} style="border-color: {rho.borderColor}; background-color: {rho.backgroundColor};">
+						<p contenteditable="true" style="color: {rho.textColor};">{rho.text}</p>
 						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'rhombus')}></span>
 						<button class="delete-btn" on:click={() => deleteShape(index, 'rhombus')}>X</button>
-						<button class="color-btn" on:click={() => changeShapeColor(index, 'rhombus')}>Color</button>
-						<button class="text-btn" on:click={() => changeTextColor(index, 'rhombus')}>Text</button>
+						<button class="select-btn" on:click={() => selectShape(rho)}>Select</button>
 					</div>
 				{/each}
 
 				{#each parallelograms as para, index}
-					<div bind:this={para.el} class="parallelogram" on:mousedown={handleMouseDown(index, 'move', 'parallelogram')}>
-						<input type="text" bind:value={para.text} />
-						<p>{para.text}</p>
+					<div bind:this={para.el} class="parallelogram" on:mousedown={handleMouseDown(index, 'move', 'parallelogram')} style="border-color: {para.borderColor}; background-color: {para.backgroundColor};">
+						<p contenteditable="true" style="color: {para.textColor};">{para.text}</p>
 						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'parallelogram')}></span>
 						<button class="delete-btn" on:click={() => deleteShape(index, 'parallelogram')}>X</button>
-						<button class="color-btn" on:click={() => changeShapeColor(index, 'parallelogram')}>Color</button>
-						<button class="text-btn" on:click={() => changeTextColor(index, 'parallelogram')}>Text</button>
+						<button class="select-btn" on:click={() => selectShape(para)}>Select</button>
 					</div>
 				{/each}
 
 				{#each triangles as tri, index}
-					<div bind:this={tri.el} class="triangle" on:mousedown={handleMouseDown(index, 'move', 'triangle')}>
-						<input type="text" bind:value={tri.text} />
-						<p>{tri.text}</p>
+					<div bind:this={tri.el} class="triangle" on:mousedown={handleMouseDown(index, 'move', 'triangle')} style="border-color: {tri.borderColor}; background-color: {tri.backgroundColor};">
+						<p contenteditable="true" style="color: {tri.textColor};">{tri.text}</p>
 						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'triangle')}></span>
 						<button class="delete-btn" on:click={() => deleteShape(index, 'triangle')}>X</button>
-						<button class="color-btn" on:click={() => changeShapeColor(index, 'triangle')}>Color</button>
-						<button class="text-btn" on:click={() => changeTextColor(index, 'triangle')}>Text</button>
+						<button class="select-btn" on:click={() => selectShape(tri)}>Select</button>
 					</div>
 				{/each}
 
 				{#each hexagons as hex, index}
-					<div bind:this={hex.el} class="hexagon" on:mousedown={handleMouseDown(index, 'move', 'hexagon')}>
-						<input type="text" bind:value={hex.text} />
-						<p>{hex.text}</p>
+					<div bind:this={hex.el} class="hexagon" on:mousedown={handleMouseDown(index, 'move', 'hexagon')} style="border-color: {hex.borderColor}; background-color: {hex.backgroundColor};">
+						<p contenteditable="true" style="color: {hex.textColor};">{hex.text}</p>
 						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'hexagon')}></span>
 						<button class="delete-btn" on:click={() => deleteShape(index, 'hexagon')}>X</button>
-						<button class="color-btn" on:click={() => changeShapeColor(index, 'hexagon')}>Color</button>
-						<button class="text-btn" on:click={() => changeTextColor(index, 'hexagon')}>Text</button>
+						<button class="select-btn" on:click={() => selectShape(hex)}>Select</button>
 					</div>
 				{/each}
 
 				{#each ors as orShape, index}
-					<div bind:this={orShape.el} class="or-shape" on:mousedown={handleMouseDown(index, 'move', 'or')}>
-						<input type="text" bind:value={orShape.text} />
-						<p>{orShape.text}</p>
+					<div bind:this={orShape.el} class="or-shape" on:mousedown={handleMouseDown(index, 'move', 'or')} style="border-color: {orShape.borderColor}; background-color: {orShape.backgroundColor};">
+						<p contenteditable="true" style="color: {orShape.textColor};">{orShape.text}</p>
 						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'or')}></span>
 						<button class="delete-btn" on:click={() => deleteShape(index, 'or')}>X</button>
-						<button class="color-btn" on:click={() => changeShapeColor(index, 'or')}>Color</button>
-						<button class="text-btn" on:click={() => changeTextColor(index, 'or')}>Text</button>
+						<button class="select-btn" on:click={() => selectShape(orShape)}>Select</button>
 					</div>
 				{/each}
 			</div>
@@ -416,9 +354,6 @@
 		border: 2px solid #000;
 		background-color: #fff;
 		cursor: move;
-		display: flex;
-		justify-content: center;
-		align-items: center;
 	}
 
 	.rectangle {
@@ -502,7 +437,8 @@
 		cursor: se-resize;
 	}
 
-	.delete-btn {
+	.delete-btn,
+	.select-btn {
 		position: absolute;
 		top: 0;
 		right: 0;
@@ -512,32 +448,13 @@
 		cursor: pointer;
 	}
 
-	.color-btn,
-	.text-btn {
-		position: absolute;
-		top: 0;
-		left: 0;
-		background-color: blue;
-		color: white;
-		border: none;
-		cursor: pointer;
+	.select-btn {
+		top: 25px;
+		background-color: green;
 	}
 
-	.color-btn {
-		top: auto;
-		bottom: 0;
-	}
-
-	.text-btn {
-		left: auto;
-		right: 0;
-	}
-
-	input[type="text"] {
-		position: absolute;
-		bottom: -20px;
-		width: 100%;
+	p {
+		margin: 0;
 		text-align: center;
-		border: none;
 	}
 </style>
