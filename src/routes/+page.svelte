@@ -1,56 +1,543 @@
-<script>	
-	import { Search } from 'flowbite-svelte';	
-	import { Card } from 'flowbite-svelte';	
-	export let data;
-	let query = '';	
-	$: results = Object.values(data.tools).filter((tool) => {	
-		return (tool.name.toLowerCase().includes(query.toLowerCase()) || tool.description.toLowerCase().includes(query.toLowerCase()));	
-	});	
-</script>	
+<script>
+	import { onMount } from "svelte";
 
-<section class="bg-white dark:bg-gray-900">	
-	<div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:px-12">	
-		<!-- <a href="#" class="inline-flex justify-between items-center py-1 px-1 pr-4 mb-7 text-sm text-gray-700 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700">	
-			<span class="text-xs bg-blue-600 rounded-full text-white px-4 py-1.5 mr-3">New</span>	
-			<span class="text-sm font-medium">Phase-I launched! Explore the story</span>	
-			<i class="icon-angle-right ml-2" />	
-		</a> -->	
-		<h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">	
-			A Comprehensive Developer Toolkit	
-		</h1>	
-		<p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">	
-			Maximize your efficiency and productivity as a developer with our free online developer	toolkit. Experience the convenience of our user-friendly platform and unlock your full potential.
-		</p>	
-		<div class="px-4 mx-auto text-center md:max-w-screen-md lg:max-w-screen-lg lg:px-36">	
-			<Search bind:value={query} />	
-		</div>	
-	</div>	
-</section><section class="bg-white dark:bg-gray-900">	
-	<div class="py-4 px-4 mx-auto max-w-screen-xl">	
-		{#if results.length}	
-			<div class="grid gap-2 space-y-0 grid-cols-2 lg:grid-cols-4">	
-				{#each results as tool}	
-					<Card href={tool.link}>	
-						<!-- <i class="icon-{tool.icon} mb-2 text-gray-500 dark:text-gray-400 text-4xl" />	 -->
-						<h5 class="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">	
-							{tool.name}	
-						</h5>
-						<p>{tool.description.length > 80 ? tool.description.substring(0, 80) + '...' : tool.description}</p>
-					</Card>	
-				{/each}	
-			</div>	
-		{:else}	
-			<div class="mx-auto max-w-screen-xl">	
-				<div class="mx-auto max-w-screen-sm text-center">	
-					<p class="mb-4 text-3xl tracking-tight font-bold text-gray-900 md:text-4xl dark:text-white">	
-						No Results Found	
-					</p>	
-					<p class="mb-4 text-lg font-light text-gray-500 dark:text-gray-400">	
-						We couldn't find any matching tool	
-					</p>	
-					<a href="/contact" class="font-medium text-sm px-5 py-2.5 text-center my-4 text-gray-500 dark:text-gray-400 underline">Request this tool</a>	
-				</div>	
-			</div>	
-		{/if}	
-	</div>	
-</section>
+	let rectangles = [];
+	let circles = [];
+	let ovals = [];
+	let rhombuses = [];
+	let parallelograms = [];
+	let triangles = [];
+	let hexagons = [];
+	let ors = [];
+	let isLoggedIn = true;
+
+	let selectedShapeColor1 = "#000000";
+	let selectedShapeColor2 = "#ffffff";
+	let selectedTextColor = "#000000";
+
+	function addRectangle() {
+		rectangles = [...rectangles, { id: rectangles.length, el: null, text: "Rectangle" }];
+	}
+
+	function addCircle() {
+		circles = [...circles, { id: circles.length, el: null, text: "Circle" }];
+	}
+
+	function addOval() {
+		ovals = [...ovals, { id: ovals.length, el: null, text: "Oval" }];
+	}
+
+	function addRhombus() {
+		rhombuses = [...rhombuses, { id: rhombuses.length, el: null, text: "Rhombus" }];
+	}
+
+	function addParallelogram() {
+		parallelograms = [...parallelograms, { id: parallelograms.length, el: null, text: "Parallelogram" }];
+	}
+
+	function addTriangle() {
+		triangles = [...triangles, { id: triangles.length, el: null, text: "Triangle" }];
+	}
+
+	function addHexagon() {
+		hexagons = [...hexagons, { id: hexagons.length, el: null, text: "Hexagon" }];
+	}
+
+	function addOr() {
+		ors = [...ors, { id: ors.length, el: null, text: "Or" }];
+	}
+
+	function handleMouseDown(index, action, type) {
+		return function (event) {
+			event.preventDefault();
+
+			let element;
+			switch (type) {
+				case 'rectangle':
+					element = rectangles[index].el;
+					break;
+				case 'circle':
+					element = circles[index].el;
+					break;
+				case 'oval':
+					element = ovals[index].el;
+					break;
+				case 'rhombus':
+					element = rhombuses[index].el;
+					break;
+				case 'parallelogram':
+					element = parallelograms[index].el;
+					break;
+				case 'triangle':
+					element = triangles[index].el;
+					break;
+				case 'hexagon':
+					element = hexagons[index].el;
+					break;
+				case 'or':
+					element = ors[index].el;
+					break;
+			}
+
+			let startX = event.clientX;
+			let startY = event.clientY;
+			let startWidth = element.offsetWidth;
+			let startHeight = element.offsetHeight;
+			let startLeft = element.offsetLeft;
+			let startTop = element.offsetTop;
+
+			function onMouseMove(event) {
+				if (action === 'move') {
+					const dx = event.clientX - startX;
+					const dy = event.clientY - startY;
+					element.style.left = `${startLeft + dx}px`;
+					element.style.top = `${startTop + dy}px`;
+				} else if (action === 'resize') {
+					const dx = event.clientX - startX;
+					const dy = event.clientY - startY;
+					element.style.width = `${startWidth + dx}px`;
+					element.style.height = `${startHeight + dy}px`;
+				}
+			}
+
+			function onMouseUp() {
+				document.removeEventListener('mousemove', onMouseMove);
+				document.removeEventListener('mouseup', onMouseUp);
+			}
+
+			document.addEventListener('mousemove', onMouseMove);
+			document.addEventListener('mouseup', onMouseUp);
+		};
+	}
+
+	function deleteShape(index, type) {
+		switch (type) {
+			case 'rectangle':
+				rectangles = rectangles.filter((_, i) => i !== index);
+				break;
+			case 'circle':
+				circles = circles.filter((_, i) => i !== index);
+				break;
+			case 'oval':
+				ovals = ovals.filter((_, i) => i !== index);
+				break;
+			case 'rhombus':
+				rhombuses = rhombuses.filter((_, i) => i !== index);
+				break;
+			case 'parallelogram':
+				parallelograms = parallelograms.filter((_, i) => i !== index);
+				break;
+			case 'triangle':
+				triangles = triangles.filter((_, i) => i !== index);
+				break;
+			case 'hexagon':
+				hexagons = hexagons.filter((_, i) => i !== index);
+				break;
+			case 'or':
+				ors = ors.filter((_, i) => i !== index);
+				break;
+		}
+	}
+
+	function changeShapeColor(index, type) {
+		let shape;
+		switch (type) {
+			case 'rectangle':
+				shape = rectangles[index];
+				break;
+			case 'circle':
+				shape = circles[index];
+				break;
+			case 'oval':
+				shape = ovals[index];
+				break;
+			case 'rhombus':
+				shape = rhombuses[index];
+				break;
+			case 'parallelogram':
+				shape = parallelograms[index];
+				break;
+			case 'triangle':
+				shape = triangles[index];
+				break;
+			case 'hexagon':
+				shape = hexagons[index];
+				break;
+			case 'or':
+				shape = ors[index];
+				break;
+		}
+		if (shape.el) {
+			shape.el.style.borderColor = selectedShapeColor1;
+			shape.el.style.backgroundColor = selectedShapeColor2;
+		}
+	}
+
+	function changeTextColor(index, type) {
+		let shape;
+		switch (type) {
+			case 'rectangle':
+				shape = rectangles[index];
+				break;
+			case 'circle':
+				shape = circles[index];
+				break;
+			case 'oval':
+				shape = ovals[index];
+				break;
+			case 'rhombus':
+				shape = rhombuses[index];
+				break;
+			case 'parallelogram':
+				shape = parallelograms[index];
+				break;
+			case 'triangle':
+				shape = triangles[index];
+				break;
+			case 'hexagon':
+				shape = hexagons[index];
+				break;
+			case 'or':
+				shape = ors[index];
+				break;
+		}
+		if (shape.el) {
+			const text = shape.el.querySelector('p');
+			if (text) {
+				text.style.color = selectedTextColor;
+			}
+		}
+	}
+</script>
+
+<div class="dashboardbody">
+	{#if isLoggedIn}
+		<div class="main-content">
+			<div class="sidebar">
+				<div class="elements-section">
+					<h2>Flowchart Elements:</h2>
+					<button on:click={addRectangle}>Add Rectangle</button>
+					<button on:click={addCircle}>Add Circle</button>
+					<button on:click={addOval}>Add Oval</button>
+					<button on:click={addRhombus}>Add Rhombus</button>
+					<button on:click={addParallelogram}>Add Parallelogram</button>
+					<button on:click={addTriangle}>Add Triangle</button>
+					<button on:click={addHexagon}>Add Hexagon</button>
+					<button on:click={addOr}>Add Or</button>
+				</div>
+
+				<div class="color-section">
+					<label for="shapeBorderColor">Shape Border Color:</label>
+					<input type="color" id="shapeBorderColor" bind:value={selectedShapeColor1}>
+				
+					<label for="shapeBackgroundColor">Shape Background Color:</label>
+					<input type="color" id="shapeBackgroundColor" bind:value={selectedShapeColor2}>
+				
+					<label for="textColor">Text Color:</label>
+					<input type="color" id="textColor" bind:value={selectedTextColor}>
+				</div>
+				
+			</div>
+
+			<div class="content" id="content-to-download">
+				{#each rectangles as rect, index}
+					<div bind:this={rect.el} class="rectangle" on:mousedown={handleMouseDown(index, 'move', 'rectangle')}>
+						<input type="text" bind:value={rect.text} />
+						<p>{rect.text}</p>
+						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'rectangle')}></span>
+						<button class="delete-btn" on:click={() => deleteShape(index, 'rectangle')}>X</button>
+						<button class="color-btn" on:click={() => changeShapeColor(index, 'rectangle')}>Color</button>
+						<button class="text-btn" on:click={() => changeTextColor(index, 'rectangle')}>Text</button>
+					</div>
+				{/each}
+
+				{#each circles as circ, index}
+					<div bind:this={circ.el} class="circle" on:mousedown={handleMouseDown(index, 'move', 'circle')}>
+						<input type="text" bind:value={circ.text} />
+						<p>{circ.text}</p>
+						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'circle')}></span>
+						<button class="delete-btn" on:click={() => deleteShape(index, 'circle')}>X</button>
+						<button class="color-btn" on:click={() => changeShapeColor(index, 'circle')}>Color</button>
+						<button class="text-btn" on:click={() => changeTextColor(index, 'circle')}>Text</button>
+					</div>
+				{/each}
+
+				{#each ovals as ov, index}
+					<div bind:this={ov.el} class="oval" on:mousedown={handleMouseDown(index, 'move', 'oval')}>
+						<input type="text" bind:value={ov.text} />
+						<p>{ov.text}</p>
+						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'oval')}></span>
+						<button class="delete-btn" on:click={() => deleteShape(index, 'oval')}>X</button>
+						<button class="color-btn" on:click={() => changeShapeColor(index, 'oval')}>Color</button>
+						<button class="text-btn" on:click={() => changeTextColor(index, 'oval')}>Text</button>
+					</div>
+				{/each}
+
+				{#each rhombuses as rho, index}
+					<div bind:this={rho.el} class="rhombus" on:mousedown={handleMouseDown(index, 'move', 'rhombus')}>
+						<input type="text" bind:value={rho.text} />
+						<p>{rho.text}</p>
+						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'rhombus')}></span>
+						<button class="delete-btn" on:click={() => deleteShape(index, 'rhombus')}>X</button>
+						<button class="color-btn" on:click={() => changeShapeColor(index, 'rhombus')}>Color</button>
+						<button class="text-btn" on:click={() => changeTextColor(index, 'rhombus')}>Text</button>
+					</div>
+				{/each}
+
+				{#each parallelograms as para, index}
+					<div bind:this={para.el} class="parallelogram" on:mousedown={handleMouseDown(index, 'move', 'parallelogram')}>
+						<input type="text" bind:value={para.text} />
+						<p>{para.text}</p>
+						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'parallelogram')}></span>
+						<button class="delete-btn" on:click={() => deleteShape(index, 'parallelogram')}>X</button>
+						<button class="color-btn" on:click={() => changeShapeColor(index, 'parallelogram')}>Color</button>
+						<button class="text-btn" on:click={() => changeTextColor(index, 'parallelogram')}>Text</button>
+					</div>
+				{/each}
+
+				{#each triangles as tri, index}
+					<div bind:this={tri.el} class="triangle" on:mousedown={handleMouseDown(index, 'move', 'triangle')}>
+						<input type="text" bind:value={tri.text} />
+						<p>{tri.text}</p>
+						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'triangle')}></span>
+						<button class="delete-btn" on:click={() => deleteShape(index, 'triangle')}>X</button>
+						<button class="color-btn" on:click={() => changeShapeColor(index, 'triangle')}>Color</button>
+						<button class="text-btn" on:click={() => changeTextColor(index, 'triangle')}>Text</button>
+					</div>
+				{/each}
+
+				{#each hexagons as hex, index}
+					<div bind:this={hex.el} class="hexagon" on:mousedown={handleMouseDown(index, 'move', 'hexagon')}>
+						<input type="text" bind:value={hex.text} />
+						<p>{hex.text}</p>
+						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'hexagon')}></span>
+						<button class="delete-btn" on:click={() => deleteShape(index, 'hexagon')}>X</button>
+						<button class="color-btn" on:click={() => changeShapeColor(index, 'hexagon')}>Color</button>
+						<button class="text-btn" on:click={() => changeTextColor(index, 'hexagon')}>Text</button>
+					</div>
+				{/each}
+
+				{#each ors as orShape, index}
+					<div bind:this={orShape.el} class="or-shape" on:mousedown={handleMouseDown(index, 'move', 'or')}>
+						<input type="text" bind:value={orShape.text} />
+						<p>{orShape.text}</p>
+						<span class="resize-handle" on:mousedown={handleMouseDown(index, 'resize', 'or')}></span>
+						<button class="delete-btn" on:click={() => deleteShape(index, 'or')}>X</button>
+						<button class="color-btn" on:click={() => changeShapeColor(index, 'or')}>Color</button>
+						<button class="text-btn" on:click={() => changeTextColor(index, 'or')}>Text</button>
+					</div>
+				{/each}
+			</div>
+		</div>
+	{/if}
+</div>
+
+<style>
+	.dashboardbody {
+		display: flex;
+	}
+
+	.main-content {
+		display: flex;
+		width: 100%;
+	}
+
+	.sidebar {
+		width: 250px;
+		background-color: #f0f0f0;
+		padding: 20px;
+		box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+	}
+
+	.elements-section,
+	.color-section {
+		margin-bottom: 20px;
+	}
+
+	.elements-section button {
+		display: block;
+		width: 100%;
+		margin-bottom: 10px;
+		padding: 10px;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		cursor: pointer;
+	}
+
+	.elements-section button:hover {
+		background-color: #0056b3;
+	}
+
+	.color-section label {
+		display: block;
+		margin-bottom: 5px;
+	}
+
+	.color-section input {
+		display: block;
+		width: 100%;
+		margin-bottom: 10px;
+	}
+
+	.color-section button {
+		display: block;
+		width: 100%;
+		padding: 10px;
+		background-color: #28a745;
+		color: white;
+		border: none;
+		cursor: pointer;
+	}
+
+	.color-section button:hover {
+		background-color: #218838;
+	}
+
+	.content {
+		flex-grow: 1;
+		position: relative;
+		background-color: #ffffff;
+		border: 1px solid #dcdcdc;
+		margin: 20px;
+		padding: 10px;
+	}
+
+	.rectangle,
+	.circle,
+	.oval,
+	.rhombus,
+	.parallelogram,
+	.triangle,
+	.hexagon,
+	.or-shape {
+		position: absolute;
+		padding: 20px;
+		border: 2px solid #000;
+		background-color: #fff;
+		cursor: move;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.rectangle {
+		width: 100px;
+		height: 60px;
+	}
+
+	.circle {
+		width: 100px;
+		height: 100px;
+		border-radius: 50%;
+	}
+
+	.oval {
+		width: 150px;
+		height: 100px;
+		border-radius: 50%;
+	}
+
+	.rhombus {
+		width: 100px;
+		height: 100px;
+		transform: rotate(45deg);
+	}
+
+	.parallelogram {
+		width: 120px;
+		height: 60px;
+		transform: skew(20deg);
+	}
+
+	.triangle {
+		width: 0;
+		height: 0;
+		border-left: 50px solid transparent;
+		border-right: 50px solid transparent;
+		border-bottom: 100px solid #000;
+	}
+
+	.hexagon {
+		width: 100px;
+		height: 55px;
+		background-color: #fff;
+		position: relative;
+		margin: 55px 0;
+	}
+
+	.hexagon:before,
+	.hexagon:after {
+		content: "";
+		position: absolute;
+		width: 0;
+		border-left: 50px solid transparent;
+		border-right: 50px solid transparent;
+	}
+
+	.hexagon:before {
+		bottom: 100%;
+		border-bottom: 27.5px solid #000;
+	}
+
+	.hexagon:after {
+		top: 100%;
+		width: 0;
+		border-top: 27.5px solid #000;
+	}
+
+	.or-shape {
+		width: 80px;
+		height: 80px;
+		border-radius: 50%;
+	}
+
+	.resize-handle {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		width: 10px;
+		height: 10px;
+		background-color: #000;
+		cursor: se-resize;
+	}
+
+	.delete-btn {
+		position: absolute;
+		top: 0;
+		right: 0;
+		background-color: red;
+		color: white;
+		border: none;
+		cursor: pointer;
+	}
+
+	.color-btn,
+	.text-btn {
+		position: absolute;
+		top: 0;
+		left: 0;
+		background-color: blue;
+		color: white;
+		border: none;
+		cursor: pointer;
+	}
+
+	.color-btn {
+		top: auto;
+		bottom: 0;
+	}
+
+	.text-btn {
+		left: auto;
+		right: 0;
+	}
+
+	input[type="text"] {
+		position: absolute;
+		bottom: -20px;
+		width: 100%;
+		text-align: center;
+		border: none;
+	}
+</style>
